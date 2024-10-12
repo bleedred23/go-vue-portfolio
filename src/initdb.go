@@ -6,6 +6,7 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"os"
+	"time"
 )
 
 type dbConn struct {
@@ -29,8 +30,15 @@ func initDb() (*dbConn, error) {
 		return nil, fmt.Errorf("error opening db: %w", err)
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("error connecting to db: %w", err)
+	for i := 1; i <= 5; i++ {
+		if err := db.Ping(); err != nil {
+			if i == 5 {
+				return nil, fmt.Errorf("error connecting to db: %w", err)
+			} else {
+				fmt.Printf("Error connecting to db at try %d, sleep 3 seconds\n", i)
+				time.Sleep(3 * time.Second)
+			}
+		}
 	}
 
 	if db == nil {
