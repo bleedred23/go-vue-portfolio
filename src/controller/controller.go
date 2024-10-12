@@ -20,6 +20,7 @@ func NewController(c *Config) {
 	controller := &Controller{
 		TransactionService: c.TransactionService,
 	}
+	c.R.Use(CORSMiddleware())
 
 	apiRoutes := c.R.Group("/api")
 	{
@@ -28,6 +29,23 @@ func NewController(c *Config) {
 		apiRoutes.POST("/txn/add", controller.AddTransaction)
 		apiRoutes.POST("/txn/edit", controller.EditTransaction)
 		apiRoutes.DELETE("/txn/delete", controller.DeleteTransaction)
+	}
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
 }
 
@@ -46,7 +64,7 @@ func (c *Controller) FindAllTransactions(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"transaction": transactions})
+		ctx.JSON(http.StatusOK, gin.H{"transactions": transactions})
 	}
 }
 
