@@ -15,13 +15,6 @@ import (
 )
 import "github.com/gin-gonic/gin"
 
-func newHandler(t string) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": t,
-		})
-	}
-}
 func main() {
 	log.Println("Starting server...")
 
@@ -31,8 +24,6 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.GET("/", newHandler("das"))
-
 	transactionRepository := repository.NewTransactionRepository(db.DB)
 	transactionService := service.NewTransactionSerivce(transactionRepository)
 
