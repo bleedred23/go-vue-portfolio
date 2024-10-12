@@ -23,6 +23,7 @@ func NewController(c *Config) {
 
 	apiRoutes := c.R.Group("/api")
 	{
+		apiRoutes.GET("/txn/:id", controller.FindTransactionById)
 		apiRoutes.GET("/txn", controller.FindAllTransactions)
 		apiRoutes.POST("/txn/add", controller.AddTransaction)
 		apiRoutes.POST("/txn/edit", controller.EditTransaction)
@@ -30,6 +31,16 @@ func NewController(c *Config) {
 	}
 }
 
+func (c *Controller) FindTransactionById(ctx *gin.Context) {
+	var request struct {
+		ID int `json:"id"`
+	}
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+}
 func (c *Controller) FindAllTransactions(ctx *gin.Context) {
 	transactions, err := c.TransactionService.FindAll(ctx.Request.Context())
 	if err != nil {

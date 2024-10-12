@@ -11,6 +11,7 @@ type TransactionService interface {
 	Edit(ctx context.Context, transaction entity.Transaction) error
 	Delete(ctx context.Context, id int) error
 	FindAll(ctx context.Context) ([]entity.Transaction, error)
+	FindById(ctx context.Context, id int) (entity.Transaction, error)
 }
 
 type transactionService struct {
@@ -21,6 +22,11 @@ func NewTransactionSerivce(repository repository.TransactionRepository) Transact
 	return &transactionService{
 		repository: repository,
 	}
+}
+
+func (s *transactionService) FindById(ctx context.Context, id int) (entity.Transaction, error) {
+	transactions, err := s.repository.FindById(ctx, id)
+	return transactions, err
 }
 
 func (s *transactionService) FindAll(ctx context.Context) ([]entity.Transaction, error) {
